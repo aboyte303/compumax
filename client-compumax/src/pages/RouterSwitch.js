@@ -28,7 +28,6 @@ function RoutersSwitches() {
     fetchSucursales();
     fetchClientes();
 
-    // Detectar si es móvil
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -92,7 +91,6 @@ function RoutersSwitches() {
     fetchRouters();
   };
 
-  // Filtro y búsqueda
   const filteredRouters = routers.filter((r) => {
     const matchSearch =
       r.nombre?.toLowerCase().includes(search.toLowerCase()) ||
@@ -108,7 +106,6 @@ function RoutersSwitches() {
     return matchSearch && matchCliente && matchSucursal;
   });
 
-  // Columnas de la tabla (solo desktop)
   const columns = [
     { header: "ID", accessor: "id" },
     { header: "Cliente", accessor: "nombre_cliente" },
@@ -125,15 +122,24 @@ function RoutersSwitches() {
       header: "Acciones",
       accessor: "acciones",
       render: (row) => (
-        <>
-          <button onClick={() => handleEdit(row)}>Editar</button>
-          <button onClick={() => handleDelete(row.id)}>Eliminar</button>
-        </>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleEdit(row)}
+            className="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition text-sm"
+          >
+            Editar
+          </button>
+          <button
+            onClick={() => handleDelete(row.id)}
+            className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm"
+          >
+            Eliminar
+          </button>
+        </div>
       ),
     },
   ];
 
-  // Diccionario de etiquetas amigables para el modal
   const labels = {
     id: "ID",
     nombre_cliente: "Cliente",
@@ -149,18 +155,23 @@ function RoutersSwitches() {
   };
 
   return (
-    <div>
-      <h2>Routers / Switches</h2>
+    <div className="p-4 space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800">Routers / Switches</h2>
 
       {/* Buscador y filtros */}
-      <div style={{ marginBottom: "15px" }}>
+      <div className="flex flex-wrap gap-3">
         <input
           type="text"
           placeholder="Buscar..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 p-2 border rounded-lg"
         />
-        <select value={filtroCliente} onChange={(e) => setFiltroCliente(e.target.value)}>
+        <select
+          value={filtroCliente}
+          onChange={(e) => setFiltroCliente(e.target.value)}
+          className="p-2 border rounded-lg"
+        >
           <option value="">Todos los clientes</option>
           {clientes.map((cl) => (
             <option key={cl.id} value={cl.id}>
@@ -168,7 +179,11 @@ function RoutersSwitches() {
             </option>
           ))}
         </select>
-        <select value={filtroSucursal} onChange={(e) => setFiltroSucursal(e.target.value)}>
+        <select
+          value={filtroSucursal}
+          onChange={(e) => setFiltroSucursal(e.target.value)}
+          className="p-2 border rounded-lg"
+        >
           <option value="">Todas las sucursales</option>
           {sucursales.map((s) => (
             <option key={s.id} value={s.id}>
@@ -179,12 +194,16 @@ function RoutersSwitches() {
       </div>
 
       {/* Formulario */}
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        className="grid md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg shadow"
+      >
         <select
           name="id_sucursal"
           value={formData.id_sucursal}
           onChange={handleChange}
           required
+          className="p-2 border rounded-lg"
         >
           <option value="">Seleccione Sucursal</option>
           {sucursales.map((s) => (
@@ -193,39 +212,49 @@ function RoutersSwitches() {
             </option>
           ))}
         </select>
-        <input type="text" name="nombre" placeholder="Nombre" value={formData.nombre} onChange={handleChange} required />
-        <input type="text" name="modelo" placeholder="Modelo" value={formData.modelo} onChange={handleChange} />
-        <input type="text" name="mac" placeholder="MAC" value={formData.mac} onChange={handleChange} />
-        <input type="text" name="sn" placeholder="Serie (SN)" value={formData.sn} onChange={handleChange} />
-        <input type="text" name="usuario" placeholder="Usuario" value={formData.usuario} onChange={handleChange} />
-        <input type="password" name="contrasena" placeholder="Contraseña" value={formData.contrasena} onChange={handleChange} />
-        <button type="submit">{formData.id ? "Actualizar" : "Agregar"}</button>
+        <input type="text" name="nombre" placeholder="Nombre" value={formData.nombre} onChange={handleChange} required className="p-2 border rounded-lg" />
+        <input type="text" name="modelo" placeholder="Modelo" value={formData.modelo} onChange={handleChange} className="p-2 border rounded-lg" />
+        <input type="text" name="mac" placeholder="MAC" value={formData.mac} onChange={handleChange} className="p-2 border rounded-lg" />
+        <input type="text" name="sn" placeholder="Serie (SN)" value={formData.sn} onChange={handleChange} className="p-2 border rounded-lg" />
+        <input type="text" name="usuario" placeholder="Usuario" value={formData.usuario} onChange={handleChange} className="p-2 border rounded-lg" />
+        <input type="password" name="contrasena" placeholder="Contraseña" value={formData.contrasena} onChange={handleChange} className="p-2 border rounded-lg" />
+        <button type="submit" className="col-span-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+          {formData.id ? "Actualizar" : "Agregar"}
+        </button>
       </form>
 
       {/* Tabla en desktop / Cards en móvil */}
       {!isMobile ? (
         <ResponsiveTable columns={columns} data={filteredRouters} />
       ) : (
-        <div>
+        <div className="space-y-4">
           {filteredRouters.map((r) => (
-            <div
-              key={r.id}
-              style={{
-                border: "1px solid #ccc",
-                borderRadius: "8px",
-                padding: "10px",
-                marginBottom: "10px",
-                background: "#f9f9f9"
-              }}
-            >
-              <h4>{r.nombre} ({r.modelo})</h4>
-              <p><strong>Cliente:</strong> {r.nombre_cliente}</p>
-              <p><strong>Sucursal:</strong> {r.nombre_sucursal}</p>
+            <div key={r.id} className="p-4 bg-white rounded-lg shadow border">
+              <h4 className="font-semibold text-gray-800">
+                {r.nombre} <span className="text-sm text-gray-500">({r.modelo})</span>
+              </h4>
+              <p className="text-sm text-gray-600"><strong>Cliente:</strong> {r.nombre_cliente}</p>
+              <p className="text-sm text-gray-600"><strong>Sucursal:</strong> {r.nombre_sucursal}</p>
 
-              <div style={{ marginTop: "10px" }}>
-                <button onClick={() => handleEdit(r)}>Editar</button>
-                <button onClick={() => handleDelete(r.id)} style={{ marginLeft: "8px" }}>Eliminar</button>
-                <button onClick={() => setSelectedRouter(r)} style={{ marginLeft: "8px" }}>Ver detalle</button>
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={() => setSelectedRouter(r)}
+                  className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600"
+                >
+                  Ver más
+                </button>
+                <button
+                  onClick={() => handleEdit(r)}
+                  className="px-3 py-1 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600"
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(r.id)}
+                  className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600"
+                >
+                  Eliminar
+                </button>
               </div>
             </div>
           ))}
@@ -235,35 +264,27 @@ function RoutersSwitches() {
       {/* Modal detalle en móvil */}
       {selectedRouter && (
         <div
-          style={{
-            position: "fixed",
-            top: 0, left: 0,
-            width: "100%", height: "100%",
-            background: "rgba(0,0,0,0.6)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000
-          }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
           onClick={() => setSelectedRouter(null)}
         >
           <div
-            style={{
-              background: "#fff",
-              padding: "20px",
-              borderRadius: "10px",
-              maxWidth: "400px",
-              width: "90%"
-            }}
+            className="bg-white rounded-xl shadow-lg p-6 w-11/12 max-w-md"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3>Detalle de router/switch</h3>
-            <ul style={{ listStyle: "none", padding: 0 }}>
+            <h3 className="text-lg font-bold mb-4">Detalle de router/switch</h3>
+            <ul className="space-y-1 text-sm text-gray-700">
               {Object.entries(selectedRouter).map(([key, value]) => (
-                <li key={key}><strong>{labels[key] || key}:</strong> {value ?? "-"}</li>
+                <li key={key}>
+                  <span className="font-medium capitalize">{labels[key] || key}:</span> {value ?? "-"}
+                </li>
               ))}
             </ul>
-            <button onClick={() => setSelectedRouter(null)}>Cerrar</button>
+            <button
+              onClick={() => setSelectedRouter(null)}
+              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
+            >
+              Cerrar
+            </button>
           </div>
         </div>
       )}

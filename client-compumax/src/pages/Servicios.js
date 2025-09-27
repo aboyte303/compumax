@@ -81,7 +81,7 @@ function Servicios() {
     }
   };
 
-  // 🔍 Filtrado búsqueda + sucursal
+  //Filtros
   const filteredServicios = servicios.filter((s) => {
     const matchSearch =
       s.nombre?.toLowerCase().includes(search.toLowerCase()) ||
@@ -93,7 +93,7 @@ function Servicios() {
     return matchSearch && matchSucursal;
   });
 
-  // 📊 Columnas tabla escritorio
+  //Columnas de tabla (desktop)
   const columns = [
     { header: "ID", accessor: "id" },
     { header: "Cliente", accessor: "nombre_cliente" },
@@ -111,15 +111,25 @@ function Servicios() {
       header: "Acciones",
       accessor: "acciones",
       render: (row) => (
-        <>
-          <button onClick={() => handleEdit(row)}>Editar</button>
-          <button onClick={() => handleDelete(row.id)}>Eliminar</button>
-        </>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleEdit(row)}
+            className="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 text-sm"
+          >
+            Editar
+          </button>
+          <button
+            onClick={() => handleDelete(row.id)}
+            className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 text-sm"
+          >
+            Eliminar
+          </button>
+        </div>
       ),
     },
   ];
 
-  // 📱 Campos que se muestran en EntityCard (móvil)
+  //Campos en tarjetas (móvil)
   const cardFields = [
     { label: "Cliente", accessor: "nombre_cliente" },
     { label: "Sucursal", accessor: "nombre_sucursal" },
@@ -129,21 +139,22 @@ function Servicios() {
   ];
 
   return (
-    <div>
-      <h2>Servicios</h2>
+    <div className="p-4 space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800">Servicios</h2>
 
-      {/* 🔍 Buscador + filtro sucursal */}
-      <div>
+      {/*Buscador + filtro */}
+      <div className="flex flex-wrap gap-3">
         <input
           type="text"
           placeholder="Buscar..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 p-2 border rounded-lg"
         />
-
         <select
           value={filterSucursal}
           onChange={(e) => setFilterSucursal(e.target.value)}
+          className="p-2 border rounded-lg"
         >
           <option value="">Todas las Sucursales</option>
           {sucursales.map((s) => (
@@ -154,13 +165,17 @@ function Servicios() {
         </select>
       </div>
 
-      {/* 📝 Formulario */}
-      <form onSubmit={handleSubmit}>
+      {/*Formulario */}
+      <form
+        onSubmit={handleSubmit}
+        className="grid md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg shadow"
+      >
         <select
           name="id_sucursal"
           value={form.id_sucursal}
           onChange={handleChange}
           required
+          className="p-2 border rounded-lg"
         >
           <option value="">Selecciona una sucursal</option>
           {sucursales.map((s) => (
@@ -177,6 +192,7 @@ function Servicios() {
           value={form.nombre}
           onChange={handleChange}
           required
+          className="p-2 border rounded-lg"
         />
 
         <input
@@ -185,6 +201,7 @@ function Servicios() {
           placeholder="Descripción"
           value={form.descripcion}
           onChange={handleChange}
+          className="p-2 border rounded-lg"
         />
 
         <input
@@ -192,16 +209,22 @@ function Servicios() {
           name="fecha"
           value={form.fecha}
           onChange={handleChange}
+          className="p-2 border rounded-lg"
         />
 
-        <button type="submit">{editId ? "Actualizar" : "Agregar"}</button>
+        <button
+          type="submit"
+          className="col-span-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+        >
+          {editId ? "Actualizar" : "Agregar"}
+        </button>
       </form>
 
-      {/* 📊 Vista escritorio vs 📱 móvil */}
+      {/*Tabla escritorio /Tarjetas móvil */}
       {!isMobile ? (
         <ResponsiveTable columns={columns} data={filteredServicios} />
       ) : (
-        <div>
+        <div className="space-y-4">
           {filteredServicios.map((s) => (
             <EntityCard
               key={s.id}

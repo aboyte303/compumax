@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import ResponsiveTable from "../components/ResponsiveTable";
@@ -31,7 +32,6 @@ function CamarasIP() {
     fetchSucursales();
     fetchClientes();
 
-    // Detectar si es móvil
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -101,24 +101,7 @@ function CamarasIP() {
     fetchCamaras();
   };
 
-  // Filtro y búsqueda
-  const filteredCamaras = camaras.filter((c) => {
-    const matchSearch =
-      c.nombre?.toLowerCase().includes(search.toLowerCase()) ||
-      c.modelo?.toLowerCase().includes(search.toLowerCase()) ||
-      c.mac?.toLowerCase().includes(search.toLowerCase()) ||
-      c.sn?.toLowerCase().includes(search.toLowerCase()) ||
-      c.ip_cliente?.toLowerCase().includes(search.toLowerCase()) ||
-      c.nombre_cliente?.toLowerCase().includes(search.toLowerCase()) ||
-      c.nombre_sucursal?.toLowerCase().includes(search.toLowerCase());
-
-    const matchCliente = filtroCliente ? c.id_cliente === parseInt(filtroCliente) : true;
-    const matchSucursal = filtroSucursal ? c.id_sucursal === parseInt(filtroSucursal) : true;
-
-    return matchSearch && matchCliente && matchSucursal;
-  });
-
-  // Columnas de la tabla (solo para desktop)
+  // Columnas tabla
   const columns = [
     { header: "ID", accessor: "id" },
     { header: "Cliente", accessor: "nombre_cliente" },
@@ -131,33 +114,46 @@ function CamarasIP() {
     { header: "Ubicación", accessor: "ubicacion" },
     { header: "Zona", accessor: "zona" },
     { header: "IP Cliente", accessor: "ip_cliente" },
-    { header: "Creado por", accessor: "creado_por_nombre" },
-    { header: "Actualizado por", accessor: "actualizado_por_nombre" },
     {
       header: "Acciones",
       accessor: "acciones",
       render: (row) => (
-        <>
-          <button onClick={() => handleEdit(row)}>Editar</button>
-          <button onClick={() => handleDelete(row.id)}>Eliminar</button>
-        </>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleEdit(row)}
+            className="px-3 py-1 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600 transition"
+          >
+            Editar
+          </button>
+          <button
+            onClick={() => handleDelete(row.id)}
+            className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition"
+          >
+            Eliminar
+          </button>
+        </div>
       ),
     },
   ];
 
   return (
-    <div>
-      <h2>Cámaras IP</h2>
+    <div className="p-6 space-y-6">
+      <h2 className="text-3xl font-bold text-gray-800">📷 Cámaras IP</h2>
 
       {/* Buscador y filtros */}
-      <div style={{ marginBottom: "15px" }}>
+      <div className="flex flex-wrap gap-3">
         <input
           type="text"
           placeholder="Buscar..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 p-2 border rounded-lg shadow-sm"
         />
-        <select value={filtroCliente} onChange={(e) => setFiltroCliente(e.target.value)}>
+        <select
+          value={filtroCliente}
+          onChange={(e) => setFiltroCliente(e.target.value)}
+          className="p-2 border rounded-lg shadow-sm"
+        >
           <option value="">Todos los clientes</option>
           {clientes.map((cl) => (
             <option key={cl.id} value={cl.id}>
@@ -165,7 +161,11 @@ function CamarasIP() {
             </option>
           ))}
         </select>
-        <select value={filtroSucursal} onChange={(e) => setFiltroSucursal(e.target.value)}>
+        <select
+          value={filtroSucursal}
+          onChange={(e) => setFiltroSucursal(e.target.value)}
+          className="p-2 border rounded-lg shadow-sm"
+        >
           <option value="">Todas las sucursales</option>
           {sucursales.map((s) => (
             <option key={s.id} value={s.id}>
@@ -176,12 +176,16 @@ function CamarasIP() {
       </div>
 
       {/* Formulario */}
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        className="grid md:grid-cols-2 gap-4 bg-white p-6 rounded-lg shadow-md"
+      >
         <select
           name="id_sucursal"
           value={formData.id_sucursal}
           onChange={handleChange}
           required
+          className="p-2 border rounded-lg"
         >
           <option value="">Seleccione Sucursal</option>
           {sucursales.map((s) => (
@@ -190,87 +194,46 @@ function CamarasIP() {
             </option>
           ))}
         </select>
-        <input type="text" name="nombre" placeholder="Nombre" value={formData.nombre} onChange={handleChange} required />
-        <input type="text" name="modelo" placeholder="Modelo" value={formData.modelo} onChange={handleChange} />
-        <input type="text" name="mac" placeholder="MAC" value={formData.mac} onChange={handleChange} />
-        <input type="text" name="sn" placeholder="Serie (SN)" value={formData.sn} onChange={handleChange} />
-        <input type="text" name="usuario" placeholder="Usuario" value={formData.usuario} onChange={handleChange} />
-        <input type="password" name="contrasena" placeholder="Contraseña" value={formData.contrasena} onChange={handleChange} />
-        <input type="text" name="ubicacion" placeholder="Ubicación" value={formData.ubicacion} onChange={handleChange} />
-        <input type="text" name="zona" placeholder="Zona" value={formData.zona} onChange={handleChange} />
-        <input type="text" name="ip_cliente" placeholder="IP Cliente" value={formData.ip_cliente} onChange={handleChange} />
-        <button type="submit">{formData.id ? "Actualizar" : "Agregar"}</button>
+        <input type="text" name="nombre" placeholder="Nombre" value={formData.nombre} onChange={handleChange} required className="p-2 border rounded-lg" />
+        <input type="text" name="modelo" placeholder="Modelo" value={formData.modelo} onChange={handleChange} className="p-2 border rounded-lg" />
+        <input type="text" name="mac" placeholder="MAC" value={formData.mac} onChange={handleChange} className="p-2 border rounded-lg" />
+        <input type="text" name="sn" placeholder="Serie (SN)" value={formData.sn} onChange={handleChange} className="p-2 border rounded-lg" />
+        <input type="text" name="usuario" placeholder="Usuario" value={formData.usuario} onChange={handleChange} className="p-2 border rounded-lg" />
+        <input type="password" name="contrasena" placeholder="Contraseña" value={formData.contrasena} onChange={handleChange} className="p-2 border rounded-lg" />
+        <input type="text" name="ubicacion" placeholder="Ubicación" value={formData.ubicacion} onChange={handleChange} className="p-2 border rounded-lg" />
+        <input type="text" name="zona" placeholder="Zona" value={formData.zona} onChange={handleChange} className="p-2 border rounded-lg" />
+        <input type="text" name="ip_cliente" placeholder="IP Cliente" value={formData.ip_cliente} onChange={handleChange} className="p-2 border rounded-lg" />
+        <button type="submit" className="col-span-full px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+          {formData.id ? "Actualizar" : "Agregar"}
+        </button>
       </form>
 
-      {/* Tabla en desktop / Cards en móvil */}
+      {/* Tabla desktop o cards en móvil */}
       {!isMobile ? (
-        <ResponsiveTable columns={columns} data={filteredCamaras} />
+        <ResponsiveTable columns={columns} data={camaras} />
       ) : (
-        <div>
-          {filteredCamaras.map((c) => (
-            <div
-              key={c.id}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: "12px",
-                padding: "12px",
-                marginBottom: "12px",
-                background: "#fff",
-                boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
-              }}
-            >
-              <h4 style={{ marginBottom: "5px" }}>{c.nombre}</h4>
-              <p style={{ margin: "2px 0" }}><strong>Modelo:</strong> {c.modelo}</p>
-              <p style={{ margin: "2px 0" }}><strong>Cliente:</strong> {c.nombre_cliente}</p>
-              <p style={{ margin: "2px 0" }}><strong>Sucursal:</strong> {c.nombre_sucursal}</p>
-              <p style={{ margin: "2px 0" }}><strong>IP:</strong> {c.ip_cliente}</p>
+        <div className="space-y-4">
+          {camaras.map((c) => (
+            <div key={c.id} className="p-4 bg-white rounded-lg shadow border">
+              <h4 className="font-semibold text-gray-800">{c.nombre}</h4>
+              <p className="text-sm text-gray-600"><strong>Modelo:</strong> {c.modelo}</p>
+              <p className="text-sm text-gray-600"><strong>Cliente:</strong> {c.nombre_cliente}</p>
+              <p className="text-sm text-gray-600"><strong>Sucursal:</strong> {c.nombre_sucursal}</p>
+              <p className="text-sm text-gray-600"><strong>IP:</strong> {c.ip_cliente}</p>
 
-              <div style={{ marginTop: "10px", display: "flex", gap: "8px" }}>
-                <button onClick={() => setSelectedCamara(c)}>Ver más</button>
-                <button onClick={() => handleEdit(c)}>Editar</button>
-                <button onClick={() => handleDelete(c.id)}>Eliminar</button>
+              <div className="flex gap-2 mt-3">
+                <button onClick={() => setSelectedCamara(c)} className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600">
+                  Ver más
+                </button>
+                <button onClick={() => handleEdit(c)} className="px-3 py-1 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600">
+                  Editar
+                </button>
+                <button onClick={() => handleDelete(c.id)} className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600">
+                  Eliminar
+                </button>
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* Modal detalle en móvil */}
-      {selectedCamara && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0, left: 0,
-            width: "100%", height: "100%",
-            background: "rgba(0,0,0,0.6)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000
-          }}
-          onClick={() => setSelectedCamara(null)}
-        >
-          <div
-            style={{
-              background: "#fff",
-              padding: "20px",
-              borderRadius: "12px",
-              maxWidth: "400px",
-              width: "90%",
-              boxShadow: "0 4px 10px rgba(0,0,0,0.2)"
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3>Detalle de cámara</h3>
-            <ul style={{ listStyle: "none", padding: 0 }}>
-              {Object.entries(selectedCamara).map(([key, value]) => (
-                <li key={key} style={{ marginBottom: "5px" }}>
-                  <strong>{key}:</strong> {value ?? "-"}
-                </li>
-              ))}
-            </ul>
-            <button onClick={() => setSelectedCamara(null)}>Cerrar</button>
-          </div>
         </div>
       )}
     </div>

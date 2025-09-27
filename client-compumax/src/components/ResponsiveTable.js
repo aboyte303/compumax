@@ -22,41 +22,57 @@ function ResponsiveTable({ columns, data }) {
   const [selectedRow, setSelectedRow] = useState(null);
 
   return (
-    <div className="responsive-table-container">
-      <table className="responsive-table">
-        <thead>
+    <div className="overflow-x-auto">
+      <table className="min-w-full border border-gray-200 rounded-lg overflow-hidden">
+        <thead className="bg-gray-100 text-gray-700">
           <tr>
             {columns.map((col, idx) => (
-              <th key={idx}>{col.header}</th>
+              <th
+                key={idx}
+                className="px-4 py-2 text-left font-semibold text-sm"
+              >
+                {col.header}
+              </th>
             ))}
-            <th className="actions-col">Acciones</th>
+            <th className="px-4 py-2 text-left font-semibold text-sm">Acciones</th>
           </tr>
         </thead>
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length + 1} style={{ textAlign: "center", opacity: 0.7 }}>
+              <td
+                colSpan={columns.length + 1}
+                className="px-4 py-4 text-center text-gray-500 italic"
+              >
                 No hay datos disponibles
               </td>
             </tr>
           ) : (
             data.map((row, idx) => (
-              <tr key={idx}>
+              <tr
+                key={idx}
+                className="border-t hover:bg-gray-50 transition-colors"
+              >
                 {columns.map((col, cidx) => {
                   const value = col.render
                     ? col.render(row)
                     : getNestedValue(row, col.accessor);
 
                   return (
-                    <td key={cidx} data-label={col.header}>
+                    <td key={cidx} className="px-4 py-2 text-sm text-gray-800">
                       {value !== undefined && value !== null && value !== ""
                         ? value
                         : col.defaultValue ?? "-"}
                     </td>
                   );
                 })}
-                <td>
-                  <button onClick={() => setSelectedRow(row)}>Ver detalle</button>
+                <td className="px-4 py-2 space-x-2">
+                  <button
+                    onClick={() => setSelectedRow(row)}
+                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
+                  >
+                    Ver detalle
+                  </button>
                 </td>
               </tr>
             ))
@@ -66,102 +82,36 @@ function ResponsiveTable({ columns, data }) {
 
       {/* Modal de detalle */}
       {selectedRow && (
-        <div className="modal-overlay" onClick={() => setSelectedRow(null)}>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          onClick={() => setSelectedRow(null)}
+        >
           <div
-            className="modal-content"
+            className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3>Detalles</h3>
-            <ul>
+            <h3 className="text-lg font-bold mb-4">Detalles</h3>
+            <ul className="space-y-2">
               {columns.map((col, i) => (
-                <li key={i}>
-                  <strong>{col.header}:</strong>{" "}
+                <li key={i} className="text-sm">
+                  <strong className="font-semibold">{col.header}:</strong>{" "}
                   {col.render
                     ? col.render(selectedRow)
                     : getNestedValue(selectedRow, col.accessor) ?? "-"}
                 </li>
               ))}
             </ul>
-            <button onClick={() => setSelectedRow(null)}>Cerrar</button>
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => setSelectedRow(null)}
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition"
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
         </div>
       )}
-
-      <style>{`
-        .responsive-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        .responsive-table th, 
-        .responsive-table td {
-          border: 1px solid #ddd;
-          padding: 8px;
-          text-align: left;
-        }
-        .actions-col {
-          width: 100px;
-        }
-
-        @media (max-width: 768px) {
-          .responsive-table thead {
-            display: none;
-          }
-          .responsive-table, 
-          .responsive-table tbody, 
-          .responsive-table tr, 
-          .responsive-table td {
-            display: block;
-            width: 100%;
-          }
-          .responsive-table tr {
-            margin-bottom: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
-          }
-          .responsive-table td {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-          }
-          .responsive-table td::before {
-            content: attr(data-label);
-            font-weight: bold;
-          }
-          .actions-col {
-            display: none; /* ocultar encabezado de acciones en móvil */
-          }
-        }
-
-        /* Modal */
-        .modal-overlay {
-          position: fixed;
-          top: 0; left: 0;
-          width: 100%; height: 100%;
-          background: rgba(0,0,0,0.6);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 999;
-        }
-        .modal-content {
-          background: #fff;
-          padding: 20px;
-          border-radius: 10px;
-          max-width: 400px;
-          width: 90%;
-        }
-        .modal-content h3 {
-          margin-top: 0;
-        }
-        .modal-content ul {
-          list-style: none;
-          padding: 0;
-        }
-        .modal-content li {
-          margin-bottom: 8px;
-        }
-      `}</style>
     </div>
   );
 }
