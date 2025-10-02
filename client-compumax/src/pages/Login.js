@@ -1,65 +1,79 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../services/api";  // 👈 importa el cliente axios
+import api from "../services/api";
 
-function Login({ onLogin }) {   // 👈 recibe la prop
+function Login({ onLogin }) {
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    console.log("🚀 Enviando credenciales:", { usuario, contrasena });
+    setLoading(true);
 
     try {
-      // 👇 usamos api.post en lugar de fetch
       const response = await api.post("/auth/login", { usuario, contrasena });
 
-      console.log("✅ Respuesta del backend:", response.data);
-
-      // Guardamos token y user en localStorage
+      // Guardar token y usuario en localStorage
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
-      // Actualizamos el estado global en App
       if (onLogin) onLogin(response.data.user);
 
-      // Redirigir a dashboard
       navigate("/dashboard");
     } catch (err) {
       console.error("Error en login:", err);
-      setError("Error en el inicio de sesión");
+      setError(
+        err.response?.data?.message || "Usuario o contraseña incorrectos"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Iniciar sesión</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
+          Iniciar sesión
+        </h2>
+
+        {error && (
+          <p className="mb-4 text-center text-sm text-red-600 font-medium">
+            {error}
+          </p>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
             placeholder="Usuario"
             value={usuario}
             onChange={(e) => setUsuario(e.target.value)}
             required
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
           />
-        </div>
-        <div>
           <input
             type="password"
             placeholder="Contraseña"
             value={contrasena}
             onChange={(e) => setContrasena(e.target.value)}
             required
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
           />
-        </div>
-        <button type="submit">Entrar</button>
-      </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+          >
+            {loading ? "Entrando..." : "Entrar"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

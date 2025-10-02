@@ -12,6 +12,7 @@ router.get('/', async (req, res) => {
       SELECT 
         rs.id,
         rs.id_sucursal,
+        su.id_cliente,
         su.nombre AS nombre_sucursal,
         c.nombre AS nombre_cliente,
         rs.nombre,

@@ -33,7 +33,7 @@ function Dashboard() {
     fetchEquipos();
   }, []);
 
-  //filtros y búsqueda
+  //Filtros y búsqueda
   const equiposFiltrados = useMemo(() => {
     return equipos.filter((e) => {
       return (
@@ -50,12 +50,12 @@ function Dashboard() {
     });
   }, [equipos, filtroCliente, filtroSucursal, filtroTipo, busqueda]);
 
-  //listas únicas de clientes, sucursales y tipos
+  //Listas únicas
   const clientes = [...new Set(equipos.map((e) => e.nombre_cliente))];
   const sucursales = [...new Set(equipos.map((e) => e.nombre_sucursal))];
   const tipos = [...new Set(equipos.map((e) => e.tipo))];
 
-  //columnas para la tabla
+  //Columnas tabla
   const columns = [
     { header: "ID", accessor: "id" },
     { header: "Cliente", accessor: "nombre_cliente" },
@@ -67,7 +67,7 @@ function Dashboard() {
     { header: "IP Cliente", accessor: (row) => row.ip_cliente || "-" },
   ];
 
-  //campos tarjetas
+  //Campos tarjetas
   const cardFields = [
     { label: "Cliente", accessor: "nombre_cliente" },
     { label: "Sucursal", accessor: "nombre_sucursal" },
@@ -78,7 +78,7 @@ function Dashboard() {
     { label: "IP Cliente", accessor: (row) => row.ip_cliente || "-" },
   ];
 
-  //resumen
+  //Resumen
   const totalEquipos = equipos.length;
   const totalClientes = clientes.length;
   const totalSucursales = sucursales.length;
@@ -88,51 +88,40 @@ function Dashboard() {
   }));
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Dashboard de Equipos</h1>
+    <div className="p-6 space-y-6">
+      <h1 className="text-2xl font-bold text-gray-800">Dashboard de Equipos</h1>
 
-      {/*Resumen*/}
-      <div
-        style={{
-          display: "flex",
-          gap: "15px",
-          marginBottom: "20px",
-          flexWrap: "wrap",
-        }}
-      >
-        <div style={cardStyle}>
-          <h3>Total Equipos</h3>
-          <p>{totalEquipos}</p>
+      {/*Resumen */}
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="bg-white p-4 rounded-xl shadow text-center">
+          <h3 className="font-semibold text-gray-600">Total Equipos</h3>
+          <p className="text-2xl font-bold">{totalEquipos}</p>
         </div>
-        <div style={cardStyle}>
-          <h3>Clientes</h3>
-          <p>{totalClientes}</p>
+        <div className="bg-white p-4 rounded-xl shadow text-center">
+          <h3 className="font-semibold text-gray-600">Clientes</h3>
+          <p className="text-2xl font-bold">{totalClientes}</p>
         </div>
-        <div style={cardStyle}>
-          <h3>Sucursales</h3>
-          <p>{totalSucursales}</p>
+        <div className="bg-white p-4 rounded-xl shadow text-center">
+          <h3 className="font-semibold text-gray-600">Sucursales</h3>
+          <p className="text-2xl font-bold">{totalSucursales}</p>
         </div>
         {equiposPorTipo.map((et) => (
-          <div key={et.tipo} style={cardStyle}>
-            <h3>{et.tipo}</h3>
-            <p>{et.cantidad}</p>
+          <div
+            key={et.tipo}
+            className="bg-white p-4 rounded-xl shadow text-center"
+          >
+            <h3 className="font-semibold text-gray-600">{et.tipo}</h3>
+            <p className="text-2xl font-bold">{et.cantidad}</p>
           </div>
         ))}
       </div>
 
       {/*Filtros */}
-      <div
-        style={{
-          marginBottom: "15px",
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "10px",
-          alignItems: "center",
-        }}
-      >
+      <div className="flex flex-wrap gap-3 items-center bg-gray-50 p-4 rounded-lg shadow">
         <select
           value={filtroCliente}
           onChange={(e) => setFiltroCliente(e.target.value)}
+          className="p-2 border rounded-lg"
         >
           <option value="">Todos los clientes</option>
           {clientes.map((c, i) => (
@@ -145,6 +134,7 @@ function Dashboard() {
         <select
           value={filtroSucursal}
           onChange={(e) => setFiltroSucursal(e.target.value)}
+          className="p-2 border rounded-lg"
         >
           <option value="">Todas las sucursales</option>
           {sucursales.map((s, i) => (
@@ -157,6 +147,7 @@ function Dashboard() {
         <select
           value={filtroTipo}
           onChange={(e) => setFiltroTipo(e.target.value)}
+          className="p-2 border rounded-lg"
         >
           <option value="">Todos los tipos</option>
           {tipos.map((t, i) => (
@@ -171,36 +162,29 @@ function Dashboard() {
           placeholder="Buscar (nombre, modelo, MAC, IP)"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
+          className="flex-1 p-2 border rounded-lg"
         />
 
-        <button onClick={limpiarFiltros}>Limpiar filtros</button>
+        <button
+          onClick={limpiarFiltros}
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+        >
+          Limpiar
+        </button>
       </div>
 
-      {/* Vista responsiva */}
+      {/*Tabla / Cards */}
       {!isMobile ? (
         <ResponsiveTable columns={columns} data={equiposFiltrados} />
       ) : (
-        <div>
+        <div className="space-y-4">
           {equiposFiltrados.map((e) => (
-            <EntityCard
-              key={`${e.tipo}-${e.id}`}
-              item={e}
-              fields={cardFields}
-            />
+            <EntityCard key={`${e.tipo}-${e.id}`} item={e} fields={cardFields} />
           ))}
         </div>
       )}
     </div>
   );
 }
-
-const cardStyle = {
-  flex: "1 1 150px",
-  background: "#f9f9f9",
-  borderRadius: "10px",
-  padding: "15px",
-  textAlign: "center",
-  boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-};
 
 export default Dashboard;

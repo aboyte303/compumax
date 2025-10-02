@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import ResponsiveTable from "../components/ResponsiveTable";
@@ -101,7 +100,23 @@ function CamarasIP() {
     fetchCamaras();
   };
 
-  // Columnas tabla
+  // 🔎 Filtro y búsqueda
+  const filteredCamaras = camaras.filter((c) => {
+    const matchSearch =
+      c.nombre?.toLowerCase().includes(search.toLowerCase()) ||
+      c.modelo?.toLowerCase().includes(search.toLowerCase()) ||
+      c.mac?.toLowerCase().includes(search.toLowerCase()) ||
+      c.sn?.toLowerCase().includes(search.toLowerCase()) ||
+      c.ip_cliente?.toLowerCase().includes(search.toLowerCase()) ||
+      c.nombre_cliente?.toLowerCase().includes(search.toLowerCase()) ||
+      c.nombre_sucursal?.toLowerCase().includes(search.toLowerCase());
+
+    const matchCliente = filtroCliente ? c.id_cliente === parseInt(filtroCliente) : true;
+    const matchSucursal = filtroSucursal ? c.id_sucursal === parseInt(filtroSucursal) : true;
+
+    return matchSearch && matchCliente && matchSucursal;
+  });
+
   const columns = [
     { header: "ID", accessor: "id" },
     { header: "Cliente", accessor: "nombre_cliente" },
@@ -138,7 +153,7 @@ function CamarasIP() {
 
   return (
     <div className="p-6 space-y-6">
-      <h2 className="text-3xl font-bold text-gray-800">📷 Cámaras IP</h2>
+      <h2 className="text-3xl font-bold text-gray-800">Cámaras IP</h2>
 
       {/* Buscador y filtros */}
       <div className="flex flex-wrap gap-3">
@@ -210,10 +225,10 @@ function CamarasIP() {
 
       {/* Tabla desktop o cards en móvil */}
       {!isMobile ? (
-        <ResponsiveTable columns={columns} data={camaras} />
+        <ResponsiveTable columns={columns} data={filteredCamaras} />
       ) : (
         <div className="space-y-4">
-          {camaras.map((c) => (
+          {filteredCamaras.map((c) => (
             <div key={c.id} className="p-4 bg-white rounded-lg shadow border">
               <h4 className="font-semibold text-gray-800">{c.nombre}</h4>
               <p className="text-sm text-gray-600"><strong>Modelo:</strong> {c.modelo}</p>
